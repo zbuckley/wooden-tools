@@ -1,0 +1,6 @@
+#!/bin/bash
+
+# download data from... somewhere?
+# TODO
+
+# for now the data can be downloaded from google drive as a zip file and extracted into data/images/
