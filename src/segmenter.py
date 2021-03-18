@@ -1,4 +1,6 @@
 import numpy as np
+import cv2
+import matplotlib.pyplot as plt
 
 # windowing loop
   # window_sizes 754x754, 1058x1058; always square
@@ -9,35 +11,36 @@ def window (
     x_step,
     y_step
 ):
-    # we'll need the x and y components of the window
-    #   TODO: this is really a placeholder, necessary because i'm not sure 
-    #       if i'm right about 0 being width, and 1 being height
-    window_x = np.round(window_size[0]/2) # TODO: is 0 the width?
-    window_y = np.round(window_size[1]/2) # TODO: is 1 the height?
-
-    # we'll iterate on the center points, so we'll need to figure what our first point is.
-    x_0 = window_x
-    y_0 = window_y
-    
     # maximum x and y size of the image
     x_max, y_max, channels = original_img.shape
+
+    window_x, window_y = window_size
 
     # initiate accumlator
     #  since we know how large the resulting array should be, this should allow quicker
     #  accumulation than python lists
-    accum = np.zeros((
-        np.floor((y_max - 2*window_y)/(window_y + y_step)),
-        np.floor((x_max - 2*window_x)/(window_x + x_step))
-    ))
+    num_x = int(x_max/x_step)
+    num_y = int(y_max/y_step)
+    accum = np.zeros((num_y, num_x))
 
-    for y in range(y_0, y_step, y_max):
-        for x in range(x_0, x_step, x_max):
-            print('Row:', y, 'Col:', x)
-            img_slice = original_img[(y - window_y):(y + window_y), (x - window_x):(x + window_x)]
+    for y in range(num_y):
+        for x in range(num_x):
+            # print('Accum Row:', y, 'Accum Col:', x)
+
+            img_y = y*y_step
+            img_x = x*x_step
+            # print('Image Row:', img_y, 'Image Col:', img_x)
+
+            img_slice = original_img[(img_y):(img_y + window_y), (img_x):(img_x + window_x), :]
             accum[x, y] = model_fnc(img_slice)
 
     return accum
 
+def heatmap(original_img, matrix, alpha=0.7):
+    orig_x, orig_y, _ = original_img.shape
+    overlay = cv2.resize(matrix, (orig_x, orig_y))
+    overlay = cv2.applyColorMap(np.uint8(overlay*255), cv2.COLORMAP_JET)
+    print(overlay.shape)
 
-# def heatmap(original_img, matrix):
-#     # plot both images
+    plt.imshow(cv2.cvtColor(original_img, cv2.COLOR_BGR2RGB))
+    plt.imshow(cv2.cvtColor(overlay, cv2.COLOR_BGR2RGB), alpha=alpha)
