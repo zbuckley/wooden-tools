@@ -4,7 +4,7 @@ import cv2
 import matplotlib.pyplot as plt
 import numpy as np
 
-img = cv2.imread("/mnt/c/Users/buckl/My Documents/GitHub/wooden-tools/data/Images/Cou1NoUselarge0.jpg")
+img = cv2.imread("C:/Users/buckl/My Documents/GitHub/wooden-tools/data/Images/Cou1NoUselarge0.jpg")
 plt.imshow(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
 plt.savefig('tmp.png')
 

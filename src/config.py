@@ -1,6 +1,6 @@
 
 
-root_dir='/mnt/c/Users/buckl/Documents/GitHub/wooden-tools'
+root_dir='C:/Users/buckl/Documents/GitHub/wooden-tools'
 
 data_dir=root_dir + '/data'
 models_dir=root_dir + '/models'

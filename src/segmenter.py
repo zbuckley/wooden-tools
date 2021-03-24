@@ -13,9 +13,9 @@ def window (
 ):
     # maximum x and y size of the image
     row_max, col_max, channels = original_img.shape
-    print('row_max', row_max)
-    print('col_max', col_max)
-    print('channels', channels)
+    # print('row_max', row_max)
+    # print('col_max', col_max)
+    # print('channels', channels)
 
     window_row, window_col = window_size
 
@@ -42,15 +42,15 @@ def window (
     return accum
 
 def heatmap(original_img, matrix, alpha=0.4):
-    print(original_img.shape)
-    print(matrix.shape)
+    # print(original_img.shape)
+    # print(matrix.shape)
     orig_rows, orig_cols, _ = original_img.shape
     overlay = cv2.resize(matrix, (orig_cols, orig_rows))
-    print('A', overlay.shape)
+    # print('A', overlay.shape)
     overlay = cv2.applyColorMap(np.uint8(overlay*255), cv2.COLORMAP_JET)
     
-    print(original_img.shape)
-    print(overlay.shape)
+    # print(original_img.shape)
+    # print(overlay.shape)
 
     plt.imshow(cv2.cvtColor(original_img, cv2.COLOR_BGR2RGB))
     plt.imshow(cv2.cvtColor(overlay, cv2.COLOR_BGR2RGB), alpha=alpha)
