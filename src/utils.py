@@ -5,6 +5,7 @@ from sklearn.preprocessing import LabelBinarizer
 import numpy as np
 import os
 import cv2
+from sklearn.metrics import accuracy_score
 
 
 def load_test_train():
@@ -75,4 +76,44 @@ def load_all(imagePaths, lb = None):
 
   return data, labels, lb
 
+
+def get_blurs_acc(blurs, blur_fnc, model, x_test, y_test, K):
+    # start from unblurred images... blur_size of 0
+    #   then apply blur of increasing sizes... 
+    results = []
+    for blur_size in blurs:
+        # print(blur_size)
+        # apply blur to all images
+        if blur_size == 0:
+            tmp_imgs = x_test
+        else:
+            tmp_imgs = np.zeros(x_test.shape)
+            # print(tmp_imgs.shape) 
+
+            # load tmp_imgs with blurred images
+            for i in range(x_test.shape[0]):
+                tmp_imgs[i, :, :, :] = blur_fnc(
+                    x_test[i, :, :, :],
+                    blur_size
+                )
+
+        # perform prediction using model
+        preds = np.zeros((tmp_imgs.shape[0], 1))
+        for i in range(0, int(tmp_imgs.shape[0]/32)):
+            start_idx = i*32
+            end_idx = min((i+1)*32, tmp_imgs.shape[0])
+            preds[start_idx:end_idx, :] = model.predict_on_batch(tmp_imgs[start_idx:end_idx, :, :, :])
+        
+        preds = np.round(preds)
+        results.append(accuracy_score(y_test, preds))
+        # K.clear_session()
+
+    return list(blurs), results
+
+def simple_blur(image, window_size):
+    return cv2.blur(image, (window_size, window_size))
+
+def gaussian_blur(image, window_size):
+    # from documentation setting stddev to 0 implies cv2 will calculate based on window_size
+    return cv2.GaussianBlur(image, (window_size, window_size), 0)
 

@@ -11,6 +11,7 @@ vggCNN_model_dir = models_dir + '/VGGCNN'
 segmentation_images_dir = data_dir + '/segmentation_images'
 full_images_dir = data_dir + '/FullImages'
 images_dir = data_dir + '/Images'
+blur_images_path = data_dir + '/blur_images'
 
 train_list_path = data_dir + '/' + 'train_large.csv'
 
