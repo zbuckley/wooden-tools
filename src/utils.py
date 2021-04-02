@@ -42,15 +42,23 @@ def load_test_train():
     return test_list, train_dict.values()
 
 
-# returns (label, image)
-def load_image(imagePath):
-    def isUsed(imagePath):
-        if 'NoUse' in imagePath:
-            return 'NoUse'
-        else:
-            return 'Use'
+def isUsed(imagePath):
+    if 'NoUse' in imagePath:
+        return 'NoUse'
+    else:
+        return 'Use'
+
+def load_raw_image(imagePath):
     label = isUsed(imagePath)
     image = cv2.imread(imagePath)
+    return (label, image)
+
+# returns (label, image)
+def load_image(imagePath):
+    label = isUsed(imagePath)
+    image = cv2.imread(imagePath)
+    # TODO: is it ok that BGR2RGB converion occurs before resize?
+    #   also ensure all functions understand that conversion to RGB has already occurred...
     image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
     image = cv2.resize(image, (224, 224))
     return (label, image)
@@ -76,7 +84,7 @@ def load_all(imagePaths, lb = None):
 
   return data, labels, lb
 
-
+## NOTE: DEPRECATED; will be replaced when blurer.py is working
 def get_blurs_acc(blurs, blur_fnc, model, x_test, y_test, K):
     # start from unblurred images... blur_size of 0
     #   then apply blur of increasing sizes... 
