@@ -6,6 +6,7 @@ import numpy as np
 import os
 import cv2
 from sklearn.metrics import accuracy_score
+from sklearn.preprocessing import label_binarize
 
 
 def load_test_train():
@@ -49,9 +50,13 @@ def isUsed(imagePath):
         return 'Use'
 
 def load_raw_image(imagePath):
-    label = isUsed(imagePath)
+    label = label_binarize([isUsed(imagePath)], classes=['NoUse', 'Use'])[0][0]
     image = cv2.imread(imagePath)
     return (label, image)
+
+def image_preprocess_cnns(bgr_image):
+    image = cv2.cvtColor(bgr_image, cv2.COLOR_BGR2RGB)
+    return cv2.resize(image, (224, 224))
 
 # returns (label, image)
 def load_image(imagePath):
@@ -76,6 +81,7 @@ def load_all(imagePaths, lb = None):
   labels = np.array(labels)
   data = np.array(data)
 
+  #TODO: confirm this makes sense... maybe just use label_binarize
   if lb is None:
     lb = LabelBinarizer()
     labels = lb.fit_transform(labels)
@@ -119,7 +125,10 @@ def get_blurs_acc(blurs, blur_fnc, model, x_test, y_test, K):
     return list(blurs), results
 
 def simple_blur(image, window_size):
-    return cv2.blur(image, (window_size, window_size))
+    if window_size == 0:
+        return image
+    else:
+        return cv2.blur(image, (window_size, window_size))
 
 def gaussian_blur(image, window_size):
     # from documentation setting stddev to 0 implies cv2 will calculate based on window_size

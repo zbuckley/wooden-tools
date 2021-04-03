@@ -1,5 +1,8 @@
-from utils import load_test_train, load_all, get_blurs_acc, simple_blur
+from utils import load_test_train, load_all, simple_blur, image_preprocess_cnns, load_raw_image
+from blurer import gen_blur_df
 import tensorflow as tf
+physical_devices = tf.config.list_physical_devices('GPU') 
+tf.config.experimental.set_memory_growth(physical_devices[0], True)
 from tensorflow import keras
 from keras import backend as K
 from config import vggCNN_model_dir, blur_images_path
@@ -7,23 +10,29 @@ import cv2
 import numpy as np
 import matplotlib.pyplot as plt
 
-physical_devices = tf.config.list_physical_devices('GPU') 
-tf.config.experimental.set_memory_growth(physical_devices[0], True)
-# tf.config.experimental.set_virtual_device_configuration(physical_devices[0], [
-#     tf.config.experimental.VirtualDeviceConfiguration(memory_limit=6144)
-# ])
-
 test_list, _ = load_test_train()
 
-x_test, y_test, _ = load_all(test_list)
+# print(test_list[:5])
 
 vgg_cnn = keras.models.load_model(vggCNN_model_dir)
 
-x, y = get_blurs_acc(range(0, 250, 1), simple_blur, vgg_cnn, x_test, y_test, K)
+def vgg_cnn_wrapper(images):
+    tmp_imgs = []
+    for image in images:
+        tmp_imgs.append(image_preprocess_cnns(image))
+    tmp_imgs = np.array(tmp_imgs)
+    # print(tmp_imgs.shape)
 
-plt.plot(x, y)
-plt.title('Accuracy vs Blur Window Size')
-plt.xlabel('Blur Window Size (Pixels)')
-plt.ylabel('Classification Accuracy')
-plt.savefig(blur_images_path + '/blur_accuracy_vgg_cnn')
-   
+    return vgg_cnn.predict_on_batch(tmp_imgs).reshape(-1)
+    
+df = gen_blur_df(
+    test_list,
+    range(250),
+    load_raw_image,
+    vgg_cnn_wrapper,
+    simple_blur
+)
+
+df.head()
+
+df.to_csv(blur_images_path + '/test_vgg_cnn.csv')
