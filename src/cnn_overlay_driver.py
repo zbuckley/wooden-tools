@@ -40,7 +40,7 @@ def build_overlaid_image(model, window_size, output_name, image_path, step_size)
     heatmap(cropping, result, alpha=0.4)
     plt.savefig(segmentation_images_dir + '/' + output_name)
 
-for model_name, model in [('cnn', simple_cnn), ('vgg', vgg_cnn)]:
+for model_name, model in [('cnn', simple_cnn)]: #('vgg', vgg_cnn)]:
     for window_size, out_name, img_path in images_list:
         img_path = full_images_dir + '/' + img_path
         build_overlaid_image(model, window_size, out_name + '-' + model_name, img_path, 10)
